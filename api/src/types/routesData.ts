@@ -35,9 +35,11 @@ export interface RoutesData {
   legs: Leg[];
 }
 
-export interface RoutePath {
-  path: string[];
+export interface RouteOption {
+  flights: ProviderLeg[];
+  totalPrice: number;
   totalDistance: number;
+  totalTravelTime: number;
 }
 
 export interface ProviderInfo {
@@ -48,9 +50,61 @@ export interface ProviderInfo {
   companyName: string;
 }
 
+export interface RawApiData {
+  id: string;
+  validUntil: Date;
+  legs: [
+    {
+      id: string;
+      routeInfo: {
+        id: string;
+        from: {
+          id: string;
+          name: string;
+        };
+        to: {
+          id: string;
+          name: string;
+        };
+        distance: number;
+      };
+      providers: [
+        {
+          id: string;
+          company: {
+            id: string;
+            name: string;
+          };
+          price: number;
+          flightStart: Date;
+          flightEnd: Date;
+        }
+      ];
+    }
+  ];
+}
+
+export interface ProviderLeg {
+  from: string;
+  to: string;
+  distance: number;
+  companyId: string;
+  company: {
+    name: string;
+  };
+  price: number;
+  flightStart: Date;
+  flightEnd: Date;
+  validUntil: Date;
+}
+
 export interface Edge {
   to: string;
   distance: number;
-  legApiId: string;
-  providers: ProviderInfo[];
+  companyName: string;
+  companyId: string;
+  price: number;
+  flightStart: Date;
+  flightEnd: Date;
+  validUntil: Date;
 }

@@ -8,11 +8,25 @@ import {
   RouteInfo,
   Provider,
   Company,
-  RoutePath,
+  ProviderLeg,
 } from "../types/routesData";
 import loadAllLegs from "../services/getAllLegs";
 import buildAdjacencyList from "../services/buildAdjacencyList";
 import findAllPaths from "../services/findAllPaths";
+
+const getLatestValidUntil = async () => {
+  try {
+    const validUntil = await prisma.validUntil.findFirst({
+      orderBy: {
+        validUntil: "desc",
+      },
+    });
+    return validUntil;
+  } catch (error) {
+    console.error(error);
+    return null;
+  }
+};
 
 const fetchPriceList = async (): Promise<RoutesData> => {
   const { data } = await axios.get(process.env.COSMOS_ODYSSEY_API_URL || "");
@@ -20,7 +34,7 @@ const fetchPriceList = async (): Promise<RoutesData> => {
   const routesData: RoutesData = {
     apiId: data.id,
     validUntil: new Date(data.validUntil),
-    legs: data.legs.map((leg: any) => {
+    legs: data.legs.map((leg) => {
       const fromPlanet: Planet = {
         apiId: leg.routeInfo.from.id,
         name: leg.routeInfo.from.name,
@@ -37,7 +51,7 @@ const fetchPriceList = async (): Promise<RoutesData> => {
         to: toPlanet,
       };
 
-      const providers: Provider[] = leg.providers.map((provider: any) => {
+      const providers: Provider[] = leg.providers.map((provider) => {
         const apiId: string = provider.id;
         const price: number = provider.price;
         const flightStart: Date = new Date(provider.flightStart);
@@ -128,45 +142,49 @@ const storeData = async (data: RoutesData) => {
       },
     },
   });
+  await prisma.validUntil.create({
+    data: {
+      validUntil: data.validUntil,
+    },
+  });
+  const providerLegPromises = data.legs.flatMap((leg) =>
+    leg.providers.map((provider) =>
+      prisma.providerLeg.create({
+        data: {
+          from: leg.routeInfo.from.name,
+          to: leg.routeInfo.to.name,
+          distance: leg.routeInfo.distance,
+          company: { connect: { apiId: provider.company.apiId } },
+          price: provider.price,
+          flightStart: provider.flightStart,
+          flightEnd: provider.flightEnd,
+          validUntil: data.validUntil,
+        },
+      })
+    )
+  );
+
+  await Promise.all(providerLegPromises);
 };
 
 export const getPriceList = async (req: Request, res: Response) => {
   try {
-    const legs: Leg[] = await loadAllLegs();
-
-    const adjacencyList = buildAdjacencyList(legs);
-
-    const {
-      from = "Neptune",
-      to = "Earth",
-      page = "1",
-      limit = "10",
-    } = req.query;
-    const origin = String(from);
-    const destination = String(to);
-    const pageNumber = parseInt(String(page), 10);
-    const limitNumber = parseInt(String(limit), 10);
-
-    const allPaths: RoutePath[] = findAllPaths(
-      adjacencyList,
-      origin,
-      destination
-    );
-
-    const sortedRoutes = allPaths.sort(
-      (a, b) => a.totalDistance - b.totalDistance
-    );
-
-    const startIndex = (pageNumber - 1) * limitNumber;
-    const endIndex = startIndex + limitNumber;
-    const paginatedRoutes = sortedRoutes.slice(startIndex, endIndex);
-
-    res.json({
-      page: pageNumber,
-      limit: limitNumber,
-      totalRoutes: sortedRoutes.length,
-      routes: paginatedRoutes,
-    });
+    const latestValidUntil = await getLatestValidUntil();
+    if (latestValidUntil && latestValidUntil.validUntil > new Date()) {
+      const providerLegs: ProviderLeg[] = await loadAllLegs(
+        "679754e36f3c6795422f15a9"
+      );
+      const adjacencyList = buildAdjacencyList(providerLegs);
+      const allPaths = findAllPaths(adjacencyList, "Saturn", "Earth");
+      res.json(allPaths);
+    } else {
+      const routesData: RoutesData = await fetchPriceList();
+      await storeData(routesData);
+      const providerLegs: ProviderLeg[] = await loadAllLegs("all");
+      const adjacencyList = buildAdjacencyList(providerLegs);
+      const allPaths = findAllPaths(adjacencyList, "Neptune", "Saturn");
+      res.json(allPaths);
+    }
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: "Failed to fetch price list" });

@@ -13,43 +13,37 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const prisma_1 = __importDefault(require("../lib/prisma"));
-const loadAllLegs = () => __awaiter(void 0, void 0, void 0, function* () {
-    const legs = yield prisma_1.default.leg.findMany({
-        include: {
-            routeInfo: {
-                include: { from: true, to: true },
+const loadAllLegs = (filter) => __awaiter(void 0, void 0, void 0, function* () {
+    let providerLegs = [];
+    if (filter === "all") {
+        providerLegs = yield prisma_1.default.providerLeg.findMany({
+            include: {
+                company: true,
             },
-            providers: {
-                include: {
-                    company: true,
-                },
+        });
+    }
+    else {
+        providerLegs = yield prisma_1.default.providerLeg.findMany({
+            where: {
+                companyId: filter,
             },
+            include: {
+                company: true,
+            },
+        });
+    }
+    return providerLegs.map((providerLeg) => ({
+        from: providerLeg.from,
+        to: providerLeg.to,
+        distance: providerLeg.distance,
+        companyId: providerLeg.companyId,
+        company: {
+            name: providerLeg.company.name,
         },
-    });
-    return legs.map((leg) => ({
-        apiId: leg.apiId,
-        routeInfo: {
-            apiId: leg.routeInfo.apiId,
-            distance: leg.routeInfo.distance,
-            from: {
-                apiId: leg.routeInfo.from.apiId,
-                name: leg.routeInfo.from.name,
-            },
-            to: {
-                apiId: leg.routeInfo.to.apiId,
-                name: leg.routeInfo.to.name,
-            },
-        },
-        providers: leg.providers.map((provider) => ({
-            apiId: provider.apiId,
-            price: provider.price,
-            flightStart: provider.flightStart,
-            flightEnd: provider.flightEnd,
-            company: {
-                apiId: provider.company.apiId,
-                name: provider.company.name,
-            },
-        })),
+        price: providerLeg.price,
+        flightStart: providerLeg.flightStart,
+        flightEnd: providerLeg.flightEnd,
+        validUntil: providerLeg.validUntil,
     }));
 });
 exports.default = loadAllLegs;

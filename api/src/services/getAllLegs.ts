@@ -1,42 +1,36 @@
 import prisma from "../lib/prisma";
+import { ProviderLeg } from "../types/routesData";
 
-const loadAllLegs = async () => {
-  const legs = await prisma.leg.findMany({
-    include: {
-      routeInfo: {
-        include: { from: true, to: true },
+const loadAllLegs = async (filter: string) => {
+  let providerLegs: ProviderLeg[] = [];
+  if (filter === "all") {
+    providerLegs = await prisma.providerLeg.findMany({
+      include: {
+        company: true,
       },
-      providers: {
-        include: {
-          company: true,
-        },
+    });
+  } else {
+    providerLegs = await prisma.providerLeg.findMany({
+      where: {
+        companyId: filter,
       },
+      include: {
+        company: true,
+      },
+    });
+  }
+  return providerLegs.map((providerLeg: ProviderLeg) => ({
+    from: providerLeg.from,
+    to: providerLeg.to,
+    distance: providerLeg.distance,
+    companyId: providerLeg.companyId,
+    company: {
+      name: providerLeg.company.name,
     },
-  });
-  return legs.map((leg) => ({
-    apiId: leg.apiId,
-    routeInfo: {
-      apiId: leg.routeInfo.apiId,
-      distance: leg.routeInfo.distance,
-      from: {
-        apiId: leg.routeInfo.from.apiId,
-        name: leg.routeInfo.from.name,
-      },
-      to: {
-        apiId: leg.routeInfo.to.apiId,
-        name: leg.routeInfo.to.name,
-      },
-    },
-    providers: leg.providers.map((provider) => ({
-      apiId: provider.apiId,
-      price: provider.price,
-      flightStart: provider.flightStart,
-      flightEnd: provider.flightEnd,
-      company: {
-        apiId: provider.company.apiId,
-        name: provider.company.name,
-      },
-    })),
+    price: providerLeg.price,
+    flightStart: providerLeg.flightStart,
+    flightEnd: providerLeg.flightEnd,
+    validUntil: providerLeg.validUntil,
   }));
 };
 

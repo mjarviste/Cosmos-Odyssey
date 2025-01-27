@@ -1,37 +1,28 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-const buildAdjacencyList = (legs) => {
+const buildAdjacencyList = (providerLegs) => {
     const adjacency = {};
-    legs.forEach((leg) => {
-        const fromName = leg.routeInfo.from.name;
-        const toName = leg.routeInfo.to.name;
-        const distance = leg.routeInfo.distance;
-        const legApiId = leg.apiId;
-        const providerInfos = leg.providers.map((provider) => ({
-            providerApiId: provider.apiId,
-            price: provider.price,
-            flightStart: provider.flightStart,
-            flightEnd: provider.flightEnd,
-            companyName: provider.company.name,
-        }));
+    providerLegs.forEach((providerLeg) => {
+        const fromName = providerLeg.from;
+        const toName = providerLeg.to;
+        const distance = providerLeg.distance;
+        const companyId = providerLeg.companyId;
+        const companyName = providerLeg.company.name;
+        const price = providerLeg.price;
+        const flightStart = providerLeg.flightStart;
+        const flightEnd = providerLeg.flightEnd;
+        const validUntil = providerLeg.validUntil;
         if (!adjacency[fromName])
             adjacency[fromName] = [];
-        const addEdge = (from, to, distance, legApiId, providers) => {
-            const existingEdge = adjacency[from].find((edge) => edge.to === to && edge.legApiId === legApiId);
-            if (existingEdge) {
-                existingEdge.providers.push(providers);
-            }
-            else {
-                adjacency[from].push({
-                    to,
-                    distance,
-                    legApiId,
-                    providers: [providers],
-                });
-            }
-        };
-        providerInfos.forEach((provider) => {
-            addEdge(fromName, toName, distance, legApiId, provider);
+        adjacency[fromName].push({
+            to: toName,
+            distance,
+            companyId,
+            companyName,
+            price,
+            flightStart,
+            flightEnd,
+            validUntil,
         });
     });
     return adjacency;

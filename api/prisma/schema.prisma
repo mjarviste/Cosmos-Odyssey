@@ -7,6 +7,81 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+// model RoutesData {
+//   id         String   @id @default(auto()) @map("_id") @db.ObjectId
+//   apiId      String   @unique
+//   validUntil DateTime
+//   legs       Leg[]
+// }
+
+// model Leg {
+//   id           String     @id @default(auto()) @map("_id") @db.ObjectId
+//   apiId        String     @unique
+//   routesDataId String     @db.ObjectId
+//   routesData   RoutesData @relation(fields: [routesDataId], references: [id])
+//   routeInfoId  String     @unique @db.ObjectId
+//   routeInfo    RouteInfo  @relation("LegToRouteInfo", fields: [routeInfoId], references: [id])
+//   providers    Provider[]
+// }
+
+// model RouteInfo {
+//   id       String @id @default(auto()) @map("_id") @db.ObjectId
+//   apiId    String @unique
+//   distance Int
+//   leg      Leg?   @relation("LegToRouteInfo")
+//   fromId   String @db.ObjectId
+//   toId     String @db.ObjectId
+//   from     Planet @relation("RouteInfoFromPlanet", fields: [fromId], references: [id])
+//   to       Planet @relation("RouteInfoToPlanet", fields: [toId], references: [id])
+// }
+
+// model Provider {
+//   id          String   @id @default(auto()) @map("_id") @db.ObjectId
+//   apiId       String   @unique
+//   company     Company  @relation("ProviderToCompany", fields: [companyId], references: [id])
+//   companyId   String   @db.ObjectId
+//   price       Int
+//   flightStart DateTime
+//   flightEnd   DateTime
+//   legId       String   @db.ObjectId
+//   leg         Leg      @relation(fields: [legId], references: [id])
+// }
+
+// model Planet {
+//   id             String      @id @default(auto()) @map("_id") @db.ObjectId
+//   apiId          String      @unique
+//   name           String
+//   routeInfosFrom RouteInfo[] @relation("RouteInfoFromPlanet")
+//   routeInfosTo   RouteInfo[] @relation("RouteInfoToPlanet")
+// }
+
+// model Company {
+//   id          String        @id @default(auto()) @map("_id") @db.ObjectId
+//   apiId       String        @unique
+//   name        String
+//   providers   Provider[]    @relation("ProviderToCompany")
+//   ProviderLeg ProviderLeg[]
+// }
+
+// model ProviderLeg {
+//   id           String   @id @default(auto()) @map("_id") @db.ObjectId
+//   apiId        String   @unique
+//   from         String
+//   to           String
+//   distance     Int
+//   companyApiId String
+//   company      Company  @relation(fields: [companyApiId], references: [apiId])
+//   price        Float
+//   flightStart  DateTime
+//   flightEnd    DateTime
+//   validUntil   DateTime
+// }
+
+// model ValidUntil {
+//   id         String   @id @default(auto()) @map("_id") @db.ObjectId
+//   validUntil DateTime
+// }
+
 model RoutesData {
   id         String   @id @default(auto()) @map("_id") @db.ObjectId
   apiId      String   @unique
@@ -56,8 +131,27 @@ model Planet {
 }
 
 model Company {
-  id        String     @id @default(auto()) @map("_id") @db.ObjectId
-  apiId     String     @unique
-  name      String
-  providers Provider[] @relation("ProviderToCompany")
+  id          String        @id @default(auto()) @map("_id") @db.ObjectId
+  apiId       String        @unique
+  name        String
+  providers   Provider[]    @relation("ProviderToCompany")
+  ProviderLeg ProviderLeg[]
+}
+
+model ProviderLeg {
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  from        String
+  to          String
+  distance    Int
+  companyId   String   @db.ObjectId
+  company     Company  @relation(fields: [companyId], references: [id])
+  price       Float
+  flightStart DateTime
+  flightEnd   DateTime
+  validUntil  DateTime
+}
+
+model ValidUntil {
+  id         String   @id @default(auto()) @map("_id") @db.ObjectId
+  validUntil DateTime
 }

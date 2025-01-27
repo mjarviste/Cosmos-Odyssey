@@ -18,6 +18,20 @@ const axios_1 = __importDefault(require("axios"));
 const getAllLegs_1 = __importDefault(require("../services/getAllLegs"));
 const buildAdjacencyList_1 = __importDefault(require("../services/buildAdjacencyList"));
 const findAllPaths_1 = __importDefault(require("../services/findAllPaths"));
+const getLatestValidUntil = () => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const validUntil = yield prisma_1.default.validUntil.findFirst({
+            orderBy: {
+                validUntil: "desc",
+            },
+        });
+        return validUntil;
+    }
+    catch (error) {
+        console.error(error);
+        return null;
+    }
+});
 const fetchPriceList = () => __awaiter(void 0, void 0, void 0, function* () {
     const { data } = yield axios_1.default.get(process.env.COSMOS_ODYSSEY_API_URL || "");
     const routesData = {
@@ -126,27 +140,42 @@ const storeData = (data) => __awaiter(void 0, void 0, void 0, function* () {
             },
         },
     });
+    yield prisma_1.default.validUntil.create({
+        data: {
+            validUntil: data.validUntil,
+        },
+    });
+    const providerLegPromises = data.legs.flatMap((leg) => leg.providers.map((provider) => prisma_1.default.providerLeg.create({
+        data: {
+            from: leg.routeInfo.from.name,
+            to: leg.routeInfo.to.name,
+            distance: leg.routeInfo.distance,
+            company: { connect: { apiId: provider.company.apiId } },
+            price: provider.price,
+            flightStart: provider.flightStart,
+            flightEnd: provider.flightEnd,
+            validUntil: data.validUntil,
+        },
+    })));
+    yield Promise.all(providerLegPromises);
 });
 const getPriceList = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const legs = yield (0, getAllLegs_1.default)();
-        const adjacencyList = (0, buildAdjacencyList_1.default)(legs);
-        const { from = "Neptune", to = "Earth", page = "1", limit = "10", } = req.query;
-        const origin = String(from);
-        const destination = String(to);
-        const pageNumber = parseInt(String(page), 10);
-        const limitNumber = parseInt(String(limit), 10);
-        const allPaths = (0, findAllPaths_1.default)(adjacencyList, origin, destination);
-        const sortedRoutes = allPaths.sort((a, b) => a.totalDistance - b.totalDistance);
-        const startIndex = (pageNumber - 1) * limitNumber;
-        const endIndex = startIndex + limitNumber;
-        const paginatedRoutes = sortedRoutes.slice(startIndex, endIndex);
-        res.json({
-            page: pageNumber,
-            limit: limitNumber,
-            totalRoutes: sortedRoutes.length,
-            routes: paginatedRoutes,
-        });
+        const latestValidUntil = yield getLatestValidUntil();
+        if (latestValidUntil && latestValidUntil.validUntil > new Date()) {
+            const providerLegs = yield (0, getAllLegs_1.default)("679754e36f3c6795422f15a9");
+            const adjacencyList = (0, buildAdjacencyList_1.default)(providerLegs);
+            const allPaths = (0, findAllPaths_1.default)(adjacencyList, "Saturn", "Earth");
+            res.json(allPaths);
+        }
+        else {
+            const routesData = yield fetchPriceList();
+            yield storeData(routesData);
+            const providerLegs = yield (0, getAllLegs_1.default)("all");
+            const adjacencyList = (0, buildAdjacencyList_1.default)(providerLegs);
+            const allPaths = (0, findAllPaths_1.default)(adjacencyList, "Neptune", "Saturn");
+            res.json(allPaths);
+        }
     }
     catch (error) {
         console.error(error);
