@@ -1,0 +1,99 @@
+.path {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background-color: #f0f0f0;
+  color: #000;
+  border-radius: 16px;
+
+  .path-info {
+    display: flex;
+    border-bottom: 1px solid #000;
+    cursor: pointer;
+    gap: 20px;
+    .path-details {
+      display: flex;
+      align-items: center;
+      gap: 40px;
+      padding: 10px 0 10px 20px;
+      width: 400px;
+
+      .planet-details {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 4px;
+
+        .planet-flight-time {
+          text-align: center;
+        }
+      }
+
+      .path-time {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        padding: 4px;
+        border-bottom: 1px solid #000;
+      }
+    }
+    .path-price {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding-inline: 20px;
+      border-left: 1px solid #000;
+      width: 100px;
+    }
+  }
+
+  .path-flights {
+    width: 100%;
+    .flight {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      width: 100%;
+      gap: 4px;
+      padding: 20px 0;
+      border-bottom: 1px solid #000;
+
+      .flight-details {
+        display: flex;
+        flex-direction: column;
+        flex: 1;
+        gap: 10px;
+        padding-left: 20px;
+        text-align: start;
+
+        .flight-company {
+          .company-name {
+            font-size: large;
+            font-weight: 600;
+          }
+        }
+
+        .flight-from-info {
+          display: flex;
+          justify-content: space-between;
+          padding-right: 20px;
+        }
+        .flight-to-info {
+          display: flex;
+          justify-content: space-between;
+          padding-right: 20px;
+        }
+      }
+      .flight-price {
+        height: 100%;
+        padding-inline: 20px;
+        border-left: 1px solid #000;
+        width: 100px;
+      }
+    }
+  }
+  .planet-name {
+    font-size: large;
+    font-weight: 600;
+  }
+}

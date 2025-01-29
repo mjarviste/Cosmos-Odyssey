@@ -32,6 +32,26 @@ const getLatestValidUntil = () => __awaiter(void 0, void 0, void 0, function* ()
         return null;
     }
 });
+const deleteOldestData = () => __awaiter(void 0, void 0, void 0, function* () {
+    const allValidUntils = yield prisma_1.default.validUntil.findMany();
+    if (allValidUntils.length > 15) {
+        prisma_1.default.validUntil.deleteMany({
+            where: {
+                validUntil: allValidUntils[allValidUntils.length - 1].validUntil,
+            },
+        });
+        prisma_1.default.routesData.deleteMany({
+            where: {
+                validUntil: allValidUntils[allValidUntils.length - 1].validUntil,
+            },
+        });
+        prisma_1.default.providerLeg.deleteMany({
+            where: {
+                validUntil: allValidUntils[allValidUntils.length - 1].validUntil,
+            },
+        });
+    }
+});
 const fetchPriceList = () => __awaiter(void 0, void 0, void 0, function* () {
     const { data } = yield axios_1.default.get(process.env.COSMOS_ODYSSEY_API_URL || "");
     const routesData = {
@@ -150,6 +170,7 @@ const storeData = (data) => __awaiter(void 0, void 0, void 0, function* () {
             from: leg.routeInfo.from.name,
             to: leg.routeInfo.to.name,
             distance: leg.routeInfo.distance,
+            companyName: provider.company.name,
             company: { connect: { apiId: provider.company.apiId } },
             price: provider.price,
             flightStart: provider.flightStart,
@@ -160,20 +181,28 @@ const storeData = (data) => __awaiter(void 0, void 0, void 0, function* () {
     yield Promise.all(providerLegPromises);
 });
 const getPriceList = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const { from, to, filter } = req.query;
+    const fromString = String(from);
+    const toString = String(to);
+    const companyFilter = String(filter);
     try {
-        const latestValidUntil = yield getLatestValidUntil();
+        let latestValidUntil = yield getLatestValidUntil();
+        console.log("latestValidUntil: ", latestValidUntil === null || latestValidUntil === void 0 ? void 0 : latestValidUntil.validUntil);
+        console.log("new Date(): ", new Date());
         if (latestValidUntil && latestValidUntil.validUntil > new Date()) {
-            const providerLegs = yield (0, getAllLegs_1.default)("679754e36f3c6795422f15a9");
+            const providerLegs = yield (0, getAllLegs_1.default)(companyFilter, latestValidUntil.validUntil);
             const adjacencyList = (0, buildAdjacencyList_1.default)(providerLegs);
-            const allPaths = (0, findAllPaths_1.default)(adjacencyList, "Saturn", "Earth");
+            const allPaths = (0, findAllPaths_1.default)(adjacencyList, fromString, toString);
             res.json(allPaths);
         }
         else {
             const routesData = yield fetchPriceList();
             yield storeData(routesData);
-            const providerLegs = yield (0, getAllLegs_1.default)("all");
+            // await deleteOldestData();
+            latestValidUntil = yield getLatestValidUntil();
+            const providerLegs = yield (0, getAllLegs_1.default)(companyFilter, latestValidUntil.validUntil);
             const adjacencyList = (0, buildAdjacencyList_1.default)(providerLegs);
-            const allPaths = (0, findAllPaths_1.default)(adjacencyList, "Neptune", "Saturn");
+            const allPaths = (0, findAllPaths_1.default)(adjacencyList, fromString, toString);
             res.json(allPaths);
         }
     }

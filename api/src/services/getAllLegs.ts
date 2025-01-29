@@ -1,10 +1,13 @@
 import prisma from "../lib/prisma";
 import { ProviderLeg } from "../types/routesData";
 
-const loadAllLegs = async (filter: string) => {
+const loadAllLegs = async (filter: string, validUntil: Date) => {
   let providerLegs: ProviderLeg[] = [];
   if (filter === "all") {
     providerLegs = await prisma.providerLeg.findMany({
+      where: {
+        validUntil: validUntil,
+      },
       include: {
         company: true,
       },
@@ -12,13 +15,15 @@ const loadAllLegs = async (filter: string) => {
   } else {
     providerLegs = await prisma.providerLeg.findMany({
       where: {
-        companyId: filter,
+        validUntil: validUntil,
+        companyName: filter,
       },
       include: {
         company: true,
       },
     });
   }
+
   return providerLegs.map((providerLeg: ProviderLeg) => ({
     from: providerLeg.from,
     to: providerLeg.to,

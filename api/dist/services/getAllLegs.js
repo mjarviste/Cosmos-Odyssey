@@ -13,10 +13,13 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const prisma_1 = __importDefault(require("../lib/prisma"));
-const loadAllLegs = (filter) => __awaiter(void 0, void 0, void 0, function* () {
+const loadAllLegs = (filter, validUntil) => __awaiter(void 0, void 0, void 0, function* () {
     let providerLegs = [];
     if (filter === "all") {
         providerLegs = yield prisma_1.default.providerLeg.findMany({
+            where: {
+                validUntil: validUntil,
+            },
             include: {
                 company: true,
             },
@@ -25,7 +28,8 @@ const loadAllLegs = (filter) => __awaiter(void 0, void 0, void 0, function* () {
     else {
         providerLegs = yield prisma_1.default.providerLeg.findMany({
             where: {
-                companyId: filter,
+                validUntil: validUntil,
+                companyName: filter,
             },
             include: {
                 company: true,

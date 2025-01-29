@@ -28,6 +28,27 @@ const getLatestValidUntil = async () => {
   }
 };
 
+const deleteOldestData = async () => {
+  const allValidUntils = await prisma.validUntil.findMany();
+  if (allValidUntils.length > 15) {
+    prisma.validUntil.deleteMany({
+      where: {
+        validUntil: allValidUntils[allValidUntils.length - 1].validUntil,
+      },
+    });
+    prisma.routesData.deleteMany({
+      where: {
+        validUntil: allValidUntils[allValidUntils.length - 1].validUntil,
+      },
+    });
+    prisma.providerLeg.deleteMany({
+      where: {
+        validUntil: allValidUntils[allValidUntils.length - 1].validUntil,
+      },
+    });
+  }
+};
+
 const fetchPriceList = async (): Promise<RoutesData> => {
   const { data } = await axios.get(process.env.COSMOS_ODYSSEY_API_URL || "");
 
@@ -154,6 +175,7 @@ const storeData = async (data: RoutesData) => {
           from: leg.routeInfo.from.name,
           to: leg.routeInfo.to.name,
           distance: leg.routeInfo.distance,
+          companyName: provider.company.name,
           company: { connect: { apiId: provider.company.apiId } },
           price: provider.price,
           flightStart: provider.flightStart,
@@ -168,21 +190,34 @@ const storeData = async (data: RoutesData) => {
 };
 
 export const getPriceList = async (req: Request, res: Response) => {
+  const { from, to, filter } = req.query;
+  const fromString = String(from);
+  const toString = String(to);
+  const companyFilter = String(filter);
+
   try {
-    const latestValidUntil = await getLatestValidUntil();
+    let latestValidUntil = await getLatestValidUntil();
+    console.log("latestValidUntil: ", latestValidUntil?.validUntil);
+    console.log("new Date(): ", new Date());
     if (latestValidUntil && latestValidUntil.validUntil > new Date()) {
       const providerLegs: ProviderLeg[] = await loadAllLegs(
-        "679754e36f3c6795422f15a9"
+        companyFilter,
+        latestValidUntil.validUntil
       );
       const adjacencyList = buildAdjacencyList(providerLegs);
-      const allPaths = findAllPaths(adjacencyList, "Saturn", "Earth");
+      const allPaths = findAllPaths(adjacencyList, fromString, toString);
       res.json(allPaths);
     } else {
       const routesData: RoutesData = await fetchPriceList();
       await storeData(routesData);
-      const providerLegs: ProviderLeg[] = await loadAllLegs("all");
+      // await deleteOldestData();
+      latestValidUntil = await getLatestValidUntil();
+      const providerLegs: ProviderLeg[] = await loadAllLegs(
+        companyFilter,
+        latestValidUntil.validUntil
+      );
       const adjacencyList = buildAdjacencyList(providerLegs);
-      const allPaths = findAllPaths(adjacencyList, "Neptune", "Saturn");
+      const allPaths = findAllPaths(adjacencyList, fromString, toString);
       res.json(allPaths);
     }
   } catch (error) {

@@ -1,0 +1,8 @@
+.layout {
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  .content {
+    height: calc(100vh - 80px);
+  }
+}

@@ -144,6 +144,7 @@ model ProviderLeg {
   to          String
   distance    Int
   companyId   String   @db.ObjectId
+  companyName String   @unique
   company     Company  @relation(fields: [companyId], references: [id])
   price       Float
   flightStart DateTime
