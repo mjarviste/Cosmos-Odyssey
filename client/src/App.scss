@@ -2,4 +2,9 @@
   max-width: 992px;
   height: 100vh;
   margin-inline: auto;
+
+  .hidden {
+    filter: blur(8px) brightness(40%);
+    pointer-events: none;
+  }
 }

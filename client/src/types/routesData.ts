@@ -1,4 +1,5 @@
 export interface ProviderLeg {
+  id: string;
   from: string;
   to: string;
   distance: number;
@@ -12,10 +13,18 @@ export interface ProviderLeg {
   validUntil: Date;
 }
 
+export interface RouteOptionProviderLeg {
+  id: string;
+  routeOptionId: string;
+  providerLegId: string;
+  providerLeg: ProviderLeg;
+}
+
 export interface RouteOption {
-  flights: ProviderLeg[]; // One provider per flight leg
-  totalPrice: number; // Sum of all provider prices
-  totalTravelTime: number; // Total travel time in minutes
+  flights: RouteOptionProviderLeg[];
+  totalPrice: number;
+  totalTravelTime: number;
+  validUntill: Date;
 }
 
 export interface PriceListResponse {
@@ -23,4 +32,23 @@ export interface PriceListResponse {
   limit: number;
   totalRoutes: number;
   routes: RouteOption[];
+}
+
+export interface Reservation {
+  id: string;
+  validUntil: Date;
+  firstName: string;
+  lastName: string;
+  fullName: string;
+  totalPrice: number;
+  totalTravelTime: number;
+  companyNames: string[];
+  flights: ReservationProviderLeg[];
+}
+
+export interface ReservationProviderLeg {
+  id: string;
+  reservationId: string;
+  providerLegId: string;
+  providerLeg: ProviderLeg;
 }

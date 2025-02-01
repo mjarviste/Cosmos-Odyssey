@@ -6,6 +6,7 @@ const buildAdjacencyList = (providerLegs: ProviderLeg[]): AdjacencyList => {
   const adjacency: AdjacencyList = {};
 
   providerLegs.forEach((providerLeg) => {
+    const id = providerLeg.id;
     const fromName = providerLeg.from;
     const toName = providerLeg.to;
     const distance = providerLeg.distance;
@@ -18,6 +19,7 @@ const buildAdjacencyList = (providerLegs: ProviderLeg[]): AdjacencyList => {
     if (!adjacency[fromName]) adjacency[fromName] = [];
 
     adjacency[fromName].push({
+      id,
       to: toName,
       distance,
       companyId,

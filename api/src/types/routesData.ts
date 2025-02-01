@@ -40,6 +40,7 @@ export interface RouteOption {
   totalPrice: number;
   totalDistance: number;
   totalTravelTime: number;
+  validUntil: Date;
 }
 
 export interface ProviderInfo {
@@ -85,6 +86,7 @@ export interface RawApiData {
 }
 
 export interface ProviderLeg {
+  id: string;
   from: string;
   to: string;
   distance: number;
@@ -99,6 +101,7 @@ export interface ProviderLeg {
 }
 
 export interface Edge {
+  id: string;
   to: string;
   distance: number;
   companyName: string;

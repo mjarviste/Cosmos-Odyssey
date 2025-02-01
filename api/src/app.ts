@@ -2,6 +2,8 @@ import express from "express";
 import dotenv from "dotenv";
 import cors from "cors";
 import priceListRouter from "./routes/prices.route";
+import reservationListRouter from "./routes/reservations.route";
+// import { fetchAndStoreData } from "./controllers/prices.controller";
 dotenv.config();
 
 const app = express();
@@ -11,8 +13,10 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 app.use("/api/prices", priceListRouter);
+app.use("/api/reservations", reservationListRouter);
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
+  // fetchAndStoreData();
   return console.log(`Express is listening at http://localhost:${PORT}`);
 });

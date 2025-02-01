@@ -12,7 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getPriceList = void 0;
+exports.getPriceList = exports.fetchAndStoreData = void 0;
 const prisma_1 = __importDefault(require("../lib/prisma"));
 const axios_1 = __importDefault(require("axios"));
 const getAllLegs_1 = __importDefault(require("../services/getAllLegs"));
@@ -34,22 +34,23 @@ const getLatestValidUntil = () => __awaiter(void 0, void 0, void 0, function* ()
 });
 const deleteOldestData = () => __awaiter(void 0, void 0, void 0, function* () {
     const allValidUntils = yield prisma_1.default.validUntil.findMany();
-    if (allValidUntils.length > 15) {
-        prisma_1.default.validUntil.deleteMany({
+    if (allValidUntils.length > 0) {
+        console.log(allValidUntils);
+        yield prisma_1.default.routesData.deleteMany({
             where: {
                 validUntil: allValidUntils[allValidUntils.length - 1].validUntil,
             },
         });
-        prisma_1.default.routesData.deleteMany({
-            where: {
-                validUntil: allValidUntils[allValidUntils.length - 1].validUntil,
-            },
-        });
-        prisma_1.default.providerLeg.deleteMany({
-            where: {
-                validUntil: allValidUntils[allValidUntils.length - 1].validUntil,
-            },
-        });
+        // await prisma.providerLeg.deleteMany({
+        //   where: {
+        //     validUntil: allValidUntils[allValidUntils.length - 1].validUntil,
+        //   },
+        // });
+        // await prisma.validUntil.deleteMany({
+        //   where: {
+        //     validUntil: allValidUntils[allValidUntils.length - 1].validUntil,
+        //   },
+        // });
     }
 });
 const fetchPriceList = () => __awaiter(void 0, void 0, void 0, function* () {
@@ -93,6 +94,7 @@ const fetchPriceList = () => __awaiter(void 0, void 0, void 0, function* () {
     return routesData;
 });
 const storeData = (data) => __awaiter(void 0, void 0, void 0, function* () {
+    console.log("Storing RoutesData...", new Date());
     yield prisma_1.default.routesData.create({
         data: {
             apiId: data.apiId,
@@ -160,17 +162,18 @@ const storeData = (data) => __awaiter(void 0, void 0, void 0, function* () {
             },
         },
     });
+    console.log("Storing RoutesData ready", new Date());
     yield prisma_1.default.validUntil.create({
         data: {
             validUntil: data.validUntil,
         },
     });
+    console.log("Storing providerLegs...", new Date());
     const providerLegPromises = data.legs.flatMap((leg) => leg.providers.map((provider) => prisma_1.default.providerLeg.create({
         data: {
             from: leg.routeInfo.from.name,
             to: leg.routeInfo.to.name,
             distance: leg.routeInfo.distance,
-            companyName: provider.company.name,
             company: { connect: { apiId: provider.company.apiId } },
             price: provider.price,
             flightStart: provider.flightStart,
@@ -179,13 +182,28 @@ const storeData = (data) => __awaiter(void 0, void 0, void 0, function* () {
         },
     })));
     yield Promise.all(providerLegPromises);
+    console.log("Storing ProviderLegs Done", new Date());
 });
+const fetchAndStoreData = () => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        yield deleteOldestData();
+        // console.log("Fetching and storing data...", new Date());
+        // const routesData: RoutesData = await fetchPriceList();
+        // await storeData(routesData);
+        // console.log("Fetching and storing data ready", new Date());
+    }
+    catch (error) {
+        console.error(error);
+    }
+});
+exports.fetchAndStoreData = fetchAndStoreData;
 const getPriceList = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { from, to, filter } = req.query;
     const fromString = String(from);
     const toString = String(to);
     const companyFilter = String(filter);
     try {
+        console.log((yield prisma_1.default.providerLeg.findMany()).length);
         let latestValidUntil = yield getLatestValidUntil();
         console.log("latestValidUntil: ", latestValidUntil === null || latestValidUntil === void 0 ? void 0 : latestValidUntil.validUntil);
         console.log("new Date(): ", new Date());

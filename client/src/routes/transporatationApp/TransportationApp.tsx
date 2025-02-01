@@ -1,14 +1,16 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import "./TransportationApp.scss";
 import useRotesData from "../../hooks/useRotesData/useRotesData";
 import { RouteOption } from "../../types/routesData";
 import Path from "../../components/path/Path";
 import SearchForm from "../../components/searchForm/SearchForm";
-import Header from "../../components/header/Header";
+import ReserveForm from "../../components/reserveForm/ReserveForm";
 
 const TransportationApp = () => {
   const { getRoutesData } = useRotesData();
   const [allPaths, setAllPaths] = useState<RouteOption[]>([]);
+  const [showReserve, setShowReserve] = useState<boolean>(false);
+  const [chosenPath, setChosenPath] = useState<RouteOption | null>(null);
 
   const handleFormSubmit = async (
     from: string,
@@ -16,6 +18,7 @@ const TransportationApp = () => {
     companyId: string
   ) => {
     const result = await getRoutesData(from, to, companyId);
+    console.log(result);
     setAllPaths(result || []);
   };
 
@@ -33,12 +36,21 @@ const TransportationApp = () => {
     }
   };
 
+  const handleReserveClose = (close: boolean) => {
+    setShowReserve(close);
+  };
+
+  const handleReserve = (path: RouteOption) => {
+    setChosenPath(path);
+    setShowReserve(true);
+  };
+
   return (
     <div className="transportation-app">
-      <div className="main-search">
+      <div className={showReserve ? "main-search hidden" : "main-search"}>
         <SearchForm onSearch={handleFormSubmit} />
       </div>
-      <div className="allPaths">
+      <div className={showReserve ? "all-paths hidden" : "all-paths"}>
         <select onChange={(event) => handleFilterChange(event.target.value)}>
           <option value="none">Filter</option>
           <option value="totalPrice">Cheapest First</option>
@@ -46,12 +58,24 @@ const TransportationApp = () => {
         </select>
         {allPaths.length > 0 ? (
           allPaths.map((path, index) => {
-            return <Path key={index} path={path} />;
+            return (
+              <div className="path-container" key={index}>
+                <Path path={path} />
+                <button onClick={() => handleReserve(path)}>Reserve</button>
+              </div>
+            );
           })
         ) : (
           <p>Loading...</p>
         )}
       </div>
+      {chosenPath && (
+        <ReserveForm
+          path={chosenPath}
+          className={showReserve ? "active" : ""}
+          onClose={handleReserveClose}
+        ></ReserveForm>
+      )}
     </div>
   );
 };

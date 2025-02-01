@@ -16,7 +16,9 @@ const loadAllLegs = async (filter: string, validUntil: Date) => {
     providerLegs = await prisma.providerLeg.findMany({
       where: {
         validUntil: validUntil,
-        companyName: filter,
+        company: {
+          name: filter,
+        },
       },
       include: {
         company: true,
@@ -25,6 +27,7 @@ const loadAllLegs = async (filter: string, validUntil: Date) => {
   }
 
   return providerLegs.map((providerLeg: ProviderLeg) => ({
+    id: providerLeg.id,
     from: providerLeg.from,
     to: providerLeg.to,
     distance: providerLeg.distance,

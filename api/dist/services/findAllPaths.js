@@ -1,6 +1,4 @@
 "use strict";
-// import { AdjacencyList } from "./buildAdjacencyList";
-// import { RoutePath } from "../types/routesData";
 Object.defineProperty(exports, "__esModule", { value: true });
 /**
  * Finds all possible routes from 'from' to 'to', selecting one provider per leg.
@@ -33,6 +31,7 @@ const findAllPaths = (adjacency, from, to) => {
                     totalPrice,
                     totalDistance,
                     totalTravelTime: totalDurationMinutes,
+                    validUntil: flights[0].validUntil,
                 });
             }
             return;
@@ -52,6 +51,7 @@ const findAllPaths = (adjacency, from, to) => {
                 visited.add(nextPlanet);
                 // Select the current provider for this leg
                 const selectedFlight = {
+                    id: edge.id,
                     from: current,
                     to: nextPlanet,
                     distance: edge.distance,

@@ -3,6 +3,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const buildAdjacencyList = (providerLegs) => {
     const adjacency = {};
     providerLegs.forEach((providerLeg) => {
+        const id = providerLeg.id;
         const fromName = providerLeg.from;
         const toName = providerLeg.to;
         const distance = providerLeg.distance;
@@ -15,6 +16,7 @@ const buildAdjacencyList = (providerLegs) => {
         if (!adjacency[fromName])
             adjacency[fromName] = [];
         adjacency[fromName].push({
+            id,
             to: toName,
             distance,
             companyId,

@@ -30,18 +30,19 @@ const getLatestValidUntil = async () => {
 
 const deleteOldestData = async () => {
   const allValidUntils = await prisma.validUntil.findMany();
-  if (allValidUntils.length > 15) {
-    prisma.validUntil.deleteMany({
+  if (allValidUntils.length > 0) {
+    console.log(allValidUntils);
+    await prisma.routesData.deleteMany({
       where: {
         validUntil: allValidUntils[allValidUntils.length - 1].validUntil,
       },
     });
-    prisma.routesData.deleteMany({
+    await prisma.providerLeg.deleteMany({
       where: {
         validUntil: allValidUntils[allValidUntils.length - 1].validUntil,
       },
     });
-    prisma.providerLeg.deleteMany({
+    await prisma.validUntil.deleteMany({
       where: {
         validUntil: allValidUntils[allValidUntils.length - 1].validUntil,
       },
@@ -96,6 +97,7 @@ const fetchPriceList = async (): Promise<RoutesData> => {
 };
 
 const storeData = async (data: RoutesData) => {
+  console.log("Storing RoutesData...", new Date());
   await prisma.routesData.create({
     data: {
       apiId: data.apiId,
@@ -163,11 +165,13 @@ const storeData = async (data: RoutesData) => {
       },
     },
   });
+  console.log("Storing RoutesData ready", new Date());
   await prisma.validUntil.create({
     data: {
       validUntil: data.validUntil,
     },
   });
+  console.log("Storing providerLegs...", new Date());
   const providerLegPromises = data.legs.flatMap((leg) =>
     leg.providers.map((provider) =>
       prisma.providerLeg.create({
@@ -175,7 +179,6 @@ const storeData = async (data: RoutesData) => {
           from: leg.routeInfo.from.name,
           to: leg.routeInfo.to.name,
           distance: leg.routeInfo.distance,
-          companyName: provider.company.name,
           company: { connect: { apiId: provider.company.apiId } },
           price: provider.price,
           flightStart: provider.flightStart,
@@ -187,6 +190,19 @@ const storeData = async (data: RoutesData) => {
   );
 
   await Promise.all(providerLegPromises);
+  console.log("Storing ProviderLegs Done", new Date());
+};
+
+export const fetchAndStoreData = async () => {
+  try {
+    await deleteOldestData();
+    // console.log("Fetching and storing data...", new Date());
+    // const routesData: RoutesData = await fetchPriceList();
+    // await storeData(routesData);
+    // console.log("Fetching and storing data ready", new Date());
+  } catch (error) {
+    console.error(error);
+  }
 };
 
 export const getPriceList = async (req: Request, res: Response) => {
@@ -196,6 +212,7 @@ export const getPriceList = async (req: Request, res: Response) => {
   const companyFilter = String(filter);
 
   try {
+    console.log((await prisma.providerLeg.findMany()).length);
     let latestValidUntil = await getLatestValidUntil();
     console.log("latestValidUntil: ", latestValidUntil?.validUntil);
     console.log("new Date(): ", new Date());

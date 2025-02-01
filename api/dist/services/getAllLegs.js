@@ -29,7 +29,9 @@ const loadAllLegs = (filter, validUntil) => __awaiter(void 0, void 0, void 0, fu
         providerLegs = yield prisma_1.default.providerLeg.findMany({
             where: {
                 validUntil: validUntil,
-                companyName: filter,
+                company: {
+                    name: filter,
+                },
             },
             include: {
                 company: true,
@@ -37,6 +39,7 @@ const loadAllLegs = (filter, validUntil) => __awaiter(void 0, void 0, void 0, fu
         });
     }
     return providerLegs.map((providerLeg) => ({
+        id: providerLeg.id,
         from: providerLeg.from,
         to: providerLeg.to,
         distance: providerLeg.distance,
