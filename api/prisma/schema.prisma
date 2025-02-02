@@ -15,12 +15,12 @@ model RoutesData {
 }
 
 model Leg {
-  id           String     @id @default(auto()) @map("_id") @db.ObjectId
-  apiId        String     @unique
-  routesDataId String     @db.ObjectId
-  routesData   RoutesData @relation(fields: [routesDataId], references: [id], onDelete: Cascade)
-  routeInfoId  String     @unique @db.ObjectId
-  routeInfo    RouteInfo  @relation("LegToRouteInfo", fields: [routeInfoId], references: [id], onDelete: Cascade)
+  id           String      @id @default(auto()) @map("_id") @db.ObjectId
+  apiId        String      @unique
+  routesDataId String      @db.ObjectId
+  routesData   RoutesData? @relation(fields: [routesDataId], references: [id], onDelete: Cascade)
+  routeInfoId  String      @unique @db.ObjectId
+  routeInfo    RouteInfo   @relation(fields: [routeInfoId], references: [id])
   providers    Provider[]
 }
 
@@ -28,17 +28,17 @@ model RouteInfo {
   id       String @id @default(auto()) @map("_id") @db.ObjectId
   apiId    String @unique
   distance Int
-  leg      Leg?   @relation("LegToRouteInfo")
   fromId   String @db.ObjectId
   toId     String @db.ObjectId
   from     Planet @relation("RouteInfoFromPlanet", fields: [fromId], references: [id])
   to       Planet @relation("RouteInfoToPlanet", fields: [toId], references: [id])
+  Leg      Leg?
 }
 
 model Provider {
   id          String   @id @default(auto()) @map("_id") @db.ObjectId
   apiId       String   @unique
-  company     Company  @relation("ProviderToCompany", fields: [companyId], references: [id])
+  company     Company  @relation(fields: [companyId], references: [id])
   companyId   String   @db.ObjectId
   price       Int
   flightStart DateTime
@@ -56,20 +56,19 @@ model Planet {
 }
 
 model Company {
-  id          String        @id @default(auto()) @map("_id") @db.ObjectId
-  apiId       String?       @unique
-  name        String
-  providers   Provider[]    @relation("ProviderToCompany")
-  ProviderLeg ProviderLeg[]
+  id        String     @id @default(auto()) @map("_id") @db.ObjectId
+  apiId     String?    @unique
+  name      String
+  providers Provider[]
 }
 
 model ProviderLeg {
   id           String                   @id @default(auto()) @map("_id") @db.ObjectId
+  apiId        String                   @unique
   from         String
   to           String
   distance     Int
-  companyId    String                   @db.ObjectId
-  company      Company                  @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  companyName  String
   price        Float
   flightStart  DateTime
   flightEnd    DateTime

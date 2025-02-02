@@ -1,3 +1,6 @@
+@import "../../styles/variables.scss";
+@import "../../styles/responsive.scss";
+
 .reserve-path {
   display: none;
   position: fixed;
@@ -6,12 +9,19 @@
   margin-inline: auto;
   left: 50%;
   transform: translate(-50%, -50%);
-  background-color: #494848;
+  background-color: $reserve-background-color;
   padding: 40px 30px;
   border-radius: 16px;
+  height: 600px;
+  overflow-y: scroll;
 
   &.active {
     display: flex;
+  }
+
+  @include sm {
+    width: calc(100% - 80px);
+    padding: 20px;
   }
   .reserve-path-heading {
     display: flex;
@@ -22,6 +32,12 @@
       cursor: pointer;
       img {
         height: 32px;
+      }
+
+      @include sm {
+        img {
+          height: 24px;
+        }
       }
     }
   }
@@ -43,9 +59,13 @@
         padding: 5px 10px;
         flex-direction: column;
         height: 60px;
-        background-color: #f0f0f0;
+        background-color: $primary-text-color;
         color: #000;
         text-align: start;
+
+        @include sm {
+          height: 40px;
+        }
 
         label {
           font-size: small;
@@ -56,12 +76,21 @@
           font-size: medium;
           height: 40px;
           border: none;
+
+          @include sm {
+            height: 30px;
+          }
         }
       }
 
       .firstname-container {
         border-top-left-radius: 16px;
         border-bottom-left-radius: 16px;
+
+        @include sm {
+          border-top-right-radius: 16px;
+          border-bottom-left-radius: 0px;
+        }
       }
     }
   }

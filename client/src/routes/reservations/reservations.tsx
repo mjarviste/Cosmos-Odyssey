@@ -2,13 +2,24 @@ import { useState } from "react";
 import "./reservations.scss";
 import { Reservation } from "../../types/routesData";
 import axios from "axios";
+import FormButton from "../../components/formButton/FormButton";
+import ReservationInfo from "../../components/reservation/ReservationInfo";
+import NoReservations from "../../components/noReservations/NoReservations";
+import { Link } from "react-router-dom";
+import Error from "../../components/error/Error";
+import useErrorHandler from "../../hooks/useErrorHandler/useErrorHandler";
 
 const Reservations = () => {
-  const [reservations, setReservations] = useState<Reservation[]>([]);
+  const [reservations, setReservations] = useState<Reservation[] | null>(null);
   const [firstName, setFirstName] = useState<string>("");
   const [lastName, setLastName] = useState<string>("");
+  const { handleError, error, errorInAnimation } = useErrorHandler();
 
   const handleSearchReservations = async () => {
+    if (firstName === "" || lastName === "") {
+      handleError("Please enter your first and last name!");
+      return;
+    }
     try {
       const reservations = await axios.get(
         "http://localhost:3000/api/reservations",
@@ -27,6 +38,11 @@ const Reservations = () => {
 
   return (
     <div className="reservations">
+      <div className="back-wrapper">
+        <Link to={"/"}>
+          <img src="./backIcon.svg" alt="" />
+        </Link>
+      </div>
       <h2>Reservations</h2>
       <div className="form-wrapper">
         <form>
@@ -48,34 +64,27 @@ const Reservations = () => {
               ></input>
             </div>
           </div>
-          <button type="button" onClick={handleSearchReservations}>
-            Search
-          </button>
+          <FormButton onClick={handleSearchReservations} label="Search" />
         </form>
       </div>
-      {reservations.length > 0 && (
+      {reservations && reservations.length > 0 ? (
         <div className="reservations-list">
           {reservations.map((reservation, index) => (
-            <div key={index} className="reservation">
-              <h3>{reservation.fullName}</h3>
-              <p>
-                Valid Until:{" "}
-                {new Date(reservation.validUntil).toLocaleDateString()}
-              </p>
-              <p>Companies: {reservation.companyNames.join(", ")}</p>
-              <div>
-                Route:{" "}
-                {reservation.flights.map((flight) => {
-                  return (
-                    <div>
-                      {flight.providerLeg.from} - {flight.providerLeg.to}
-                    </div>
-                  );
-                })}
-              </div>
-            </div>
+            <ReservationInfo
+              key={index}
+              reservation={reservation}
+              index={index}
+            />
           ))}
         </div>
+      ) : (
+        <NoReservations reservations={reservations} />
+      )}
+      {error && (
+        <Error
+          message={error}
+          className={errorInAnimation ? "inAnimation" : "outAnimation"}
+        />
       )}
     </div>
   );

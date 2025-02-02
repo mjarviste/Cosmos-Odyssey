@@ -1,16 +1,33 @@
 import { useState } from "react";
 import "./SearchForm.scss";
+import FormButton from "../formButton/FormButton";
 
 interface SearchFormProps {
   onSearch: (from: string, to: string, filter: string) => void;
+  companyNames?: string[];
+  planetNames?: string[];
+  handleError: (error: string) => void;
 }
 
-const SearchForm: React.FC<SearchFormProps> = ({ onSearch }) => {
-  const [from, setFrom] = useState<string>("Earth");
-  const [to, setTo] = useState<string>("Mars");
+const SearchForm: React.FC<SearchFormProps> = ({
+  onSearch,
+  companyNames,
+  planetNames,
+  handleError,
+}) => {
+  const [from, setFrom] = useState<string>("");
+  const [to, setTo] = useState<string>("");
   const [companyName, setCompanyName] = useState<string>("all");
 
   const handleSearch = () => {
+    if (from === "" || to === "") {
+      handleError("Please select both from and to planets");
+      return;
+    }
+    if (from === to) {
+      handleError("From and To planets cannot be the same");
+      return;
+    }
     onSearch(from, to, companyName);
   };
 
@@ -25,14 +42,14 @@ const SearchForm: React.FC<SearchFormProps> = ({ onSearch }) => {
             className="from"
             onChange={(event) => setFrom(event.target.value)}
           >
-            <option value="Mercury">Mercury</option>
-            <option value="Venus">Venus</option>
-            <option value="Earth">Earth</option>
-            <option value="Mars">Mars</option>
-            <option value="Jupiter">Jupiter</option>
-            <option value="Saturn">Saturn</option>
-            <option value="Uranus">Uranus</option>
-            <option value="Neptune">Neptune</option>
+            <option value={""}>From Planet</option>
+            {planetNames?.map((planetName) => {
+              return (
+                <option key={planetName} value={planetName}>
+                  {planetName}
+                </option>
+              );
+            })}
           </select>
         </div>
         <div className="to-container input-container">
@@ -43,14 +60,14 @@ const SearchForm: React.FC<SearchFormProps> = ({ onSearch }) => {
             className="to"
             onChange={(event) => setTo(event.target.value)}
           >
-            <option value="Mercury">Mercury</option>
-            <option value="Venus">Venus</option>
-            <option value="Earth">Earth</option>
-            <option value="Mars">Mars</option>
-            <option value="Jupiter">Jupiter</option>
-            <option value="Saturn">Saturn</option>
-            <option value="Uranus">Uranus</option>
-            <option value="Neptune">Neptune</option>
+            <option value={""}>To Planet</option>
+            {planetNames?.map((planetName) => {
+              return (
+                <option key={planetName} value={planetName}>
+                  {planetName}
+                </option>
+              );
+            })}
           </select>
         </div>
         <div className="company-container input-container">
@@ -61,14 +78,17 @@ const SearchForm: React.FC<SearchFormProps> = ({ onSearch }) => {
             onChange={(event) => setCompanyName(event.target.value)}
           >
             <option value="all">All</option>
-            <option value="SpaceX">SpaceX</option>
-            <option value="Travel Nova">Travel Nova</option>
+            {companyNames?.map((companyName) => {
+              return (
+                <option key={companyName} value={companyName}>
+                  {companyName}
+                </option>
+              );
+            })}
           </select>
         </div>
       </div>
-      <button type="button" onClick={handleSearch}>
-        Search
-      </button>
+      <FormButton onClick={handleSearch} label="Search" />
     </form>
   );
 };

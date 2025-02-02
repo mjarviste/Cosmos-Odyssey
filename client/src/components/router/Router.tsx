@@ -1,8 +1,8 @@
 import React from "react";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
-import TransportationApp from "../../routes/transporatationApp/TransportationApp";
+import Prices from "../../routes/prices/prices";
 import Layout from "../../routes/layout/layout";
-import Reservations from "../../routes/reservations/Reservations";
+import Reservations from "../../routes/reservations/reservations";
 
 const Router: React.FC = () => {
   const router = createBrowserRouter([
@@ -12,7 +12,7 @@ const Router: React.FC = () => {
       children: [
         {
           path: "/",
-          element: <TransportationApp />,
+          element: <Prices />,
         },
         {
           path: "/reservations",

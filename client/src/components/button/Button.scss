@@ -1,0 +1,14 @@
+@import "../../styles/variables.scss";
+
+.custom-button {
+  background-color: $button-background-color;
+  color: $primary-text-color;
+  cursor: pointer;
+  padding: 0px 20px;
+  border: 0px;
+  border-radius: 16px;
+
+  &:hover {
+    filter: brightness(1.1);
+  }
+}

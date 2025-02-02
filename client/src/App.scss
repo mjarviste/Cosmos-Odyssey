@@ -1,7 +1,14 @@
+@import "styles/responsive.scss";
+
 .app {
   max-width: 992px;
   height: 100vh;
   margin-inline: auto;
+  padding: 30px;
+
+  @include sm {
+    padding: 20px;
+  }
 
   .hidden {
     filter: blur(8px) brightness(40%);

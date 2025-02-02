@@ -1,0 +1,53 @@
+@import "../../styles/variables.scss";
+
+.confirm-component {
+  position: fixed;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 5px;
+  bottom: 25px;
+  background-color: $confirm-bg-color;
+  color: $confirm-color;
+  height: 50px;
+  padding-inline: 15px;
+  border-radius: 8px;
+  text-align: center;
+  border: 1px solid $confirm-color;
+  font-size: 12px;
+  box-shadow: $default-box-shadow;
+  left: 50%;
+  transform: translate(-50%, -50%);
+
+  &.inAnimation {
+    animation: inAnimation 250ms ease-in;
+  }
+
+  &.outAnimation {
+    animation: outAnimation 350ms ease-out;
+  }
+
+  img {
+    height: 1.5rem;
+  }
+}
+
+@keyframes inAnimation {
+  0% {
+    opacity: 0;
+    transform: translate(-50%, 50px);
+  }
+  100% {
+    opacity: 1;
+    transform: translate(-50%, 0);
+  }
+}
+
+@keyframes outAnimation {
+  0% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}

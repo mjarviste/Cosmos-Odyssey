@@ -1,27 +1,17 @@
 export interface ProviderLeg {
-  id: string;
+  apiId: string;
   from: string;
   to: string;
   distance: number;
-  companyId: string;
-  company: {
-    name: string;
-  };
+  companyName: string;
   price: number;
   flightStart: Date;
   flightEnd: Date;
   validUntil: Date;
 }
 
-export interface RouteOptionProviderLeg {
-  id: string;
-  routeOptionId: string;
-  providerLegId: string;
-  providerLeg: ProviderLeg;
-}
-
 export interface RouteOption {
-  flights: RouteOptionProviderLeg[];
+  flights: ProviderLeg[];
   totalPrice: number;
   totalTravelTime: number;
   validUntill: Date;
@@ -36,13 +26,13 @@ export interface PriceListResponse {
 
 export interface Reservation {
   id: string;
-  validUntil: Date;
   firstName: string;
   lastName: string;
   fullName: string;
   totalPrice: number;
   totalTravelTime: number;
   companyNames: string[];
+  validUntil: Date;
   flights: ReservationProviderLeg[];
 }
 

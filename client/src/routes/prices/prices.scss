@@ -1,0 +1,36 @@
+@import "../../styles/variables.scss";
+
+.all-paths {
+  display: flex;
+  justify-content: center;
+  .all-paths-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+
+    select {
+      align-self: flex-end;
+      padding: 5px 10px;
+      border: 0px;
+      border-radius: 8px;
+      font-family: inherit;
+      background-color: $primary-text-color;
+      box-shadow: $default-box-shadow;
+    }
+
+    .path-container {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+
+      button {
+        cursor: pointer;
+        height: 60px;
+        padding: 0px 20px;
+        border: 0px;
+        border-radius: 16px;
+      }
+    }
+  }
+}

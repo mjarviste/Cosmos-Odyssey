@@ -1,0 +1,12 @@
+@import "./variables.scss";
+
+@mixin sm {
+  @media (max-width: 600px) {
+    @content;
+  }
+}
+@mixin md {
+  @media (max-width: 992px) {
+    @content;
+  }
+}

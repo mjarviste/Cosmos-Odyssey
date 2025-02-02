@@ -1,9 +1,11 @@
+@import "../../styles/variables.scss";
+
 .header {
   display: flex;
   justify-content: space-between;
   align-items: center;
   height: 80px;
-  margin-bottom: 80px;
+  margin-bottom: 40px;
 
   .header-logo {
     display: flex;
@@ -16,6 +18,8 @@
     span {
       font-size: large;
       font-weight: 600;
+      color: $primary-text-color;
+      text-decoration: none;
     }
   }
   .header-reservations-btn {

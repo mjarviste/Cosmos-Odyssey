@@ -1,0 +1,70 @@
+@import "../../styles/variables.scss";
+@import "../../styles/responsive.scss";
+
+.reservation {
+  display: flex;
+  justify-content: center;
+  .reservation-container {
+    display: flex;
+    flex-direction: column;
+    align-items: start;
+    background-color: $primary-text-color;
+    color: $secondary-text-color;
+    padding: 10px;
+    border-radius: 16px;
+    width: 500px;
+
+    @include sm {
+      width: 100%;
+    }
+
+    .reservation-flights {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      width: 100%;
+      .flight {
+        display: grid;
+        padding: 10px;
+        border-top: 1px solid $secondary-text-color;
+      }
+      .flight-company {
+        justify-self: start;
+      }
+      .flight-details {
+        justify-self: center;
+        display: flex;
+        gap: 60px;
+
+        .flight-from {
+          display: flex;
+          flex-direction: column;
+        }
+        .flight-to {
+          display: flex;
+          flex-direction: column;
+        }
+      }
+    }
+    .reservation-info {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      border-top: 1px solid $secondary-text-color;
+      padding: 10px 0px;
+      width: 100%;
+
+      .reservation-info-field {
+        display: flex;
+        justify-content: space-between;
+      }
+    }
+  }
+}
+
+.label {
+  font-size: small;
+}
+h4 {
+  margin: 0;
+}

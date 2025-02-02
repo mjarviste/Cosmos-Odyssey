@@ -1,12 +1,15 @@
 import { useState } from "react";
 import { RouteOption } from "../../types/routesData";
 import "./Path.scss";
+import Button from "../button/Button";
+import { minutesToDays } from "../../services/minutesToDays";
 
 interface PathProps {
   path: RouteOption;
+  handleReserve?: (path: RouteOption) => void;
 }
 
-const Path: React.FC<PathProps> = ({ path }) => {
+const Path: React.FC<PathProps> = ({ path, handleReserve }) => {
   const [showDropdown, setShowDropdown] = useState(false);
   return (
     <div className="path" onClick={() => setShowDropdown(!showDropdown)}>
@@ -19,7 +22,7 @@ const Path: React.FC<PathProps> = ({ path }) => {
             </span>
           </div>
           <div className="path-time">
-            <span>{path.totalTravelTime}</span>
+            <span>{minutesToDays(path.totalTravelTime)}</span>
           </div>
           <div className="planet-details">
             <span className="planet-name">
@@ -33,7 +36,7 @@ const Path: React.FC<PathProps> = ({ path }) => {
           </div>
         </div>
         <div className="path-price">
-          <span>{path.totalPrice.toFixed(2)}</span>
+          <span>{path.totalPrice.toFixed(2)} €</span>
         </div>
       </div>
       {showDropdown ? (
@@ -44,7 +47,7 @@ const Path: React.FC<PathProps> = ({ path }) => {
                 <div className="flight-details">
                   <div className="flight-company">
                     <span>Company: </span>
-                    <span className="company-name">{flight.company.name}</span>
+                    <span className="company-name">{flight.companyName}</span>
                   </div>
                   <div className="flight-from-info">
                     <span>{new Date(flight.flightStart).toLocaleString()}</span>
@@ -56,11 +59,18 @@ const Path: React.FC<PathProps> = ({ path }) => {
                   </div>
                 </div>
                 <div className="flight-price">
-                  <span>{flight.price}</span>
+                  <span>{flight.price} €</span>
                 </div>
               </div>
             );
           })}
+          {handleReserve && (
+            <div className="reserve-container">
+              <div className="button-container">
+                <Button label="Reserve" onClick={() => handleReserve(path)} />
+              </div>
+            </div>
+          )}
         </div>
       ) : null}
     </div>

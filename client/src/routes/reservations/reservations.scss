@@ -1,50 +1,67 @@
-form {
-  display: flex;
-  width: 100%;
-  padding: 20px 0;
-  gap: 5px;
-  margin-bottom: 60px;
-  .inputs-container {
-    display: flex;
-    flex: 1;
-    gap: 5px;
+@import "../../styles/variables.scss";
+@import "../../styles/responsive.scss";
 
-    .input-container {
+.reservations {
+  .back-wrapper {
+    img {
+      width: 32px;
+      cursor: pointer;
+    }
+  }
+  form {
+    display: flex;
+    width: 100%;
+    padding: 20px 0;
+    gap: 5px;
+    margin-bottom: 60px;
+    .inputs-container {
       display: flex;
       flex: 1;
-      padding: 5px 10px;
-      flex-direction: column;
-      height: 60px;
-      background-color: #f0f0f0;
-      color: #000;
-      text-align: start;
+      gap: 5px;
 
-      label {
-        font-size: small;
+      .input-container {
+        display: flex;
+        flex: 1;
+        padding: 5px 10px;
+        flex-direction: column;
+        height: 60px;
+        background-color: $primary-text-color;
+        color: $secondary-text-color;
+        text-align: start;
+
+        @include sm {
+          height: 40px;
+        }
+
+        label {
+          font-size: small;
+        }
+        input {
+          background-color: inherit;
+          color: inherit;
+          font-size: medium;
+          height: 40px;
+          border: none;
+
+          @include sm {
+            height: 30px;
+          }
+        }
       }
-      input {
-        background-color: inherit;
-        color: inherit;
-        font-size: medium;
-        height: 40px;
-        border: none;
+      .firstname-container {
+        border-top-left-radius: 16px;
+        border-bottom-left-radius: 16px;
+
+        @include sm {
+          border-bottom-left-radius: 0px;
+          border-top-right-radius: 16px;
+        }
       }
     }
-    .firstname-container {
-      border-top-left-radius: 16px;
-      border-bottom-left-radius: 16px;
-    }
-    button {
-      border-top-right-radius: 16px;
-      border-bottom-right-radius: 16px;
-      border: 1px solid transparent;
-      padding: 0.6em 1.2em;
-      font-size: 1em;
-      font-weight: 500;
-      font-family: inherit;
-      background-color: #737375;
-      cursor: pointer;
-      transition: border-color 0.25s;
-    }
+  }
+  .reservations-list {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
   }
 }

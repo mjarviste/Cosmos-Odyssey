@@ -1,16 +1,6 @@
 import { ProviderLeg, RouteOption } from "../types/routesData";
 import { AdjacencyList } from "./buildAdjacencyList";
 
-/**
- * Finds all possible routes from 'from' to 'to', selecting one provider per leg.
- * Allows mixing and matching providers from different companies.
- * Calculates the total price for each route.
- *
- * @param adjacency - The adjacency list representing the graph with provider options.
- * @param from - The starting planet name.
- * @param to - The destination planet name.
- * @returns An array of RouteOption objects representing all possible routes.
- */
 const findAllPaths = (
   adjacency: AdjacencyList,
   from: string,
@@ -18,14 +8,6 @@ const findAllPaths = (
 ): RouteOption[] => {
   const allRoutes: RouteOption[] = [];
 
-  /**
-   * Recursive helper function to perform DFS traversal.
-   *
-   * @param current - The current planet.
-   * @param visited - A set of visited planets to avoid cycles.
-   * @param flights - The list of selected ProviderLegs for the current path.
-   * @param totalPrice - The accumulated price for the current path.
-   */
   const dfs = (
     current: string,
     visited: Set<string>,
@@ -35,7 +17,6 @@ const findAllPaths = (
     firstFlightStartTime: Date | null,
     lastFlightEndTime: Date | null
   ) => {
-    // Base case: Destination reached
     if (current === to) {
       if (flights.length > 0 && firstFlightStartTime && lastFlightEndTime) {
         const totalDurationMs =
@@ -52,15 +33,12 @@ const findAllPaths = (
       return;
     }
 
-    // Get all possible flight options from the current planet
     const neighbors = adjacency[current] || [];
 
     for (const edge of neighbors) {
       const nextPlanet = edge.to;
 
-      // Avoid cycles by checking if the planet has already been visited
       if (!visited.has(nextPlanet)) {
-        // Mark the planet as visited
         const flightStart = new Date(edge.flightStart);
         const flightEnd = new Date(edge.flightEnd);
 
@@ -69,31 +47,25 @@ const findAllPaths = (
         }
 
         visited.add(nextPlanet);
-
-        // Select the current provider for this leg
         const selectedFlight: ProviderLeg = {
-          id: edge.id,
+          apiId: edge.apiId,
           from: current,
           to: nextPlanet,
           distance: edge.distance,
-          companyId: edge.companyId,
-          company: {
-            name: edge.companyName,
-          },
+          companyName: edge.companyName,
           price: edge.price,
           flightStart: edge.flightStart,
           flightEnd: edge.flightEnd,
           validUntil: edge.validUntil,
         };
 
-        // Add the selected flight to the current path
         flights.push(selectedFlight);
         totalPrice += edge.price;
         totalDistance += edge.distance;
 
         const updatedFirstStartTime = firstFlightStartTime || flightStart;
         const updatedLastEndTime = flightEnd;
-        // Recurse to the next planet
+
         dfs(
           nextPlanet,
           visited,
@@ -104,7 +76,6 @@ const findAllPaths = (
           updatedLastEndTime
         );
 
-        // Backtrack: Remove the current planet and flight from the path
         visited.delete(nextPlanet);
         flights.pop();
         totalPrice -= edge.price;
@@ -113,7 +84,6 @@ const findAllPaths = (
     }
   };
 
-  // Initialize DFS traversal
   const visited = new Set<string>();
   visited.add(from);
   dfs(from, visited, [], 0, 0, null, null);

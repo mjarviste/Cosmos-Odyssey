@@ -4,13 +4,16 @@ import { RouteOption } from "../../types/routesData";
 const useRotesData = () => {
   const fetchRotesData = async (from: string, to: string, filter: string) => {
     try {
-      const data = await axios.get("http://localhost:3000/api/prices", {
-        params: {
-          from,
-          to,
-          filter,
-        },
-      });
+      const data = await axios.get(
+        `${import.meta.env.VITE_API_URL}/api/prices`,
+        {
+          params: {
+            from,
+            to,
+            filter,
+          },
+        }
+      );
       return data;
     } catch (error) {
       console.error(error);
@@ -29,7 +32,30 @@ const useRotesData = () => {
     }
   };
 
-  return { getRoutesData };
+  const getCompanyNames = async () => {
+    try {
+      const companyNames = await axios.get(
+        `${import.meta.env.VITE_API_URL}/api/prices/companies`
+      );
+      return companyNames;
+    } catch (error) {
+      console.error(error);
+      return null;
+    }
+  };
+  const getPlanetNames = async () => {
+    try {
+      const planetNames = await axios.get(
+        `${import.meta.env.VITE_API_URL}/api/prices/planets`
+      );
+      return planetNames;
+    } catch (error) {
+      console.error(error);
+      return null;
+    }
+  };
+
+  return { getRoutesData, getCompanyNames, getPlanetNames };
 };
 
 export default useRotesData;

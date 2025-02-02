@@ -16,17 +16,16 @@ export interface Planet {
   name: string;
 }
 
+export interface Leg {
+  apiId: string;
+  routeInfo: RouteInfo;
+  providers: Provider[];
+}
 export interface RouteInfo {
   apiId: string;
   distance: number;
   from: Planet;
   to: Planet;
-}
-
-export interface Leg {
-  apiId: string;
-  routeInfo: RouteInfo;
-  providers: Provider[];
 }
 
 export interface RoutesData {
@@ -86,14 +85,11 @@ export interface RawApiData {
 }
 
 export interface ProviderLeg {
-  id: string;
+  apiId: string;
   from: string;
   to: string;
   distance: number;
-  companyId: string;
-  company: {
-    name: string;
-  };
+  companyName: string;
   price: number;
   flightStart: Date;
   flightEnd: Date;
@@ -101,11 +97,10 @@ export interface ProviderLeg {
 }
 
 export interface Edge {
-  id: string;
+  apiId: string;
   to: string;
   distance: number;
   companyName: string;
-  companyId: string;
   price: number;
   flightStart: Date;
   flightEnd: Date;

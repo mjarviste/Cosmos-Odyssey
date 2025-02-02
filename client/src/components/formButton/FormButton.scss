@@ -1,0 +1,23 @@
+@import "../../styles/variables.scss";
+@import "../../styles/responsive.scss";
+
+.form-button {
+  background-color: $button-background-color;
+  color: $primary-text-color;
+  border-top-right-radius: 16px;
+  border-bottom-right-radius: 16px;
+  padding: 10px 20px;
+  font-size: 16px;
+  font-weight: 500;
+  font-family: inherit;
+  cursor: pointer;
+  border: 0px;
+  &:hover {
+    filter: brightness(1.1);
+  }
+
+  @include sm {
+    margin-top: 5px;
+    border-radius: 16px;
+  }
+}

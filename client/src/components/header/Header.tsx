@@ -1,5 +1,6 @@
 import { Link } from "react-router-dom";
 import "./Header.scss";
+import Button from "../button/Button";
 
 const Header = () => {
   return (
@@ -12,7 +13,7 @@ const Header = () => {
       </Link>
       <div className="header-reservations-btn">
         <Link to={"/reservations"}>
-          <button>My Reservations</button>
+          <Button label="My Reservations" />
         </Link>
       </div>
     </div>

@@ -1,4 +1,3 @@
-import TransportationApp from "./routes/transporatationApp/TransportationApp";
 import "./App.scss";
 import Router from "./components/router/Router";
 

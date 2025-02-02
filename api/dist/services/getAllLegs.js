@@ -8,45 +8,37 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
 Object.defineProperty(exports, "__esModule", { value: true });
-const prisma_1 = __importDefault(require("../lib/prisma"));
 const loadAllLegs = (filter, validUntil) => __awaiter(void 0, void 0, void 0, function* () {
-    let providerLegs = [];
-    if (filter === "all") {
-        providerLegs = yield prisma_1.default.providerLeg.findMany({
-            where: {
-                validUntil: validUntil,
-            },
-            include: {
-                company: true,
-            },
-        });
-    }
-    else {
-        providerLegs = yield prisma_1.default.providerLeg.findMany({
-            where: {
-                validUntil: validUntil,
-                company: {
-                    name: filter,
-                },
-            },
-            include: {
-                company: true,
-            },
-        });
-    }
+    const providerLegs = [];
+    // if (filter === "all") {
+    //   providerLegs = await prisma.providerLeg.findMany({
+    //     where: {
+    //       validUntil: validUntil,
+    //     },
+    //     include: {
+    //       company: true,
+    //     },
+    //   });
+    // } else {
+    //   providerLegs = await prisma.providerLeg.findMany({
+    //     where: {
+    //       validUntil: validUntil,
+    //       company: {
+    //         name: filter,
+    //       },
+    //     },
+    //     include: {
+    //       company: true,
+    //     },
+    //   });
+    // }
     return providerLegs.map((providerLeg) => ({
-        id: providerLeg.id,
+        apiId: providerLeg.apiId,
         from: providerLeg.from,
         to: providerLeg.to,
         distance: providerLeg.distance,
-        companyId: providerLeg.companyId,
-        company: {
-            name: providerLeg.company.name,
-        },
+        companyName: providerLeg.companyName,
         price: providerLeg.price,
         flightStart: providerLeg.flightStart,
         flightEnd: providerLeg.flightEnd,
